@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VALORANT // Tournament Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #0f1923;
+            --bg-panel: #172535;
+            --bg-card: #203144;
+            --accent-neon: #00f0ff;
+            --accent-red: #ff4655;
+            --text-light: #ece8e1;
+            --text-muted: #7e8b9b;
+            --border-color: #384656;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- SIDEBAR LATERAL --- */
+        aside {
+            width: 260px;
+            background-color: var(--bg-panel);
+            border-right: 2px solid var(--accent-red);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .brand {
+            padding: 25px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand i {
+            color: var(--accent-red);
+            font-size: 2rem;
+        }
+
+        .brand h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 20px 15px;
+            flex-grow: 1;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 14px 20px;
+            text-align: left;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            color: var(--bg-dark);
+            background-color: var(--accent-neon);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+
+        /* --- CONTEÚDO PRINCIPAL --- */
+        main {
+            margin-left: 260px;
+            flex-grow: 1;
+            padding: 40px;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 10% 20%, rgba(15, 25, 35, 0.95) 0%, rgba(20, 33, 48, 0.95) 90%);
+        }
+
+        header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 2.2rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 3px solid var(--accent-red);
+            padding-bottom: 5px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: var(--bg-panel);
+            border: 1px solid var(--accent-neon);
+            color: var(--accent-neon);
+            padding: 10px 15px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        /* --- ELEMENTOS DE FORMULÁRIO --- */
+        .btn-action {
+            background: var(--accent-red);
+            color: var(--text-light);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            border-radius: 3px;
+        }
+
+        .btn-action:hover {
+            background-color: #d13441;
+            transform: translateY(-2px);
+        }
+
+        input, select {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent-neon);
+            box-shadow: 0 0 5px rgba(0, 240, 255, 0.3);
+        }
+
+        /* --- ABAS / SEÇÕES --- */
+        .section-tab {
+            display: none;
+        }
+
+        .section-tab.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        /* --- ABA: EQUIPES --- */
+        .teams-manager {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        .sidebar-forms {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .card-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: 6px;
+        }
+
+        .card-panel h3 {
+            margin-bottom: 20px;
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            color: var(--accent-neon);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .group-rename-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* Grid de Times Adicionados */
+        .teams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .team-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .team-logo-container {
+            width: 70px;
+            height: 70px;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .team-logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .team-card h4 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .team-card span {
+            color: var(--accent-neon);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 3px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .btn-edit { background: var(--border-color); color: var(--text-light); }
+        .btn-delete { background: rgba(255, 70, 85, 0.2); color: var(--accent-red); border: 1px solid var(--accent-red); }
+        .btn-delete:hover { background: var(--accent-red); color: white; }
+
+        /* --- ABA: GRUPOS --- */
+        .groups-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 25px;
+        }
+
+        .group-table-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .group-table-card h3 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.5rem;
+            color: var(--accent-neon);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .group-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .group-table th, .group-table td {
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        .group-table th {
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .group-table tbody tr {
+            border-bottom: 1px solid rgba(56, 70, 86, 0.4);
+            transition: background 0.2s;
+        }
+
+        .group-table tbody tr:hover {
+            background: rgba(0, 240, 255, 0.03);
+        }
+
+        .team-row-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .table-logo {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            object-fit: cover;
+        }
+
+        /* --- ABA: JOGOS --- */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+            gap: 25px;
+        }
+
+        .game-card {
+            background: var(--bg-panel);
+            border-left: 4px solid var(--accent-neon);
+            border-radius: 4px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(56, 70, 86, 0.4);
+            padding-bottom: 8px;
+        }
+
+        .matchup {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .matchup-team {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 40%;
+        }
+
+        .matchup-team.home { justify-content: flex-end; text-align: right; }
+        .matchup-team.away { justify-content: flex-start; text-align: left; }
+
+        .score-input-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 20%;
+            justify-content: center;
+        }
+
+        .score-input {
+            width: 45px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 5px;
+        }
+
+        .vs {
+            font-weight: 700;
+            color: var(--accent-red);
+        }
+
+        /* --- ABA: PLAYOFFS (CHAVE DUPLA ELIMINAÇÃO) --- */
+        .playoffs-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+        }
+
+        .bracket-section {
+            background: rgba(23, 37, 53, 0.4);
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        .bracket-section h3 {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            color: var(--accent-red);
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+            border-left: 4px solid var(--accent-red);
+            padding-left: 10px;
+        }
+
+        .bracket-section.lower h3 {
+            color: var(--accent-neon);
+            border-left-color: var(--accent-neon);
+        }
+
+        .bracket-rounds-wrapper {
+            display: flex;
+            gap: 40px;
+            min-width: 900px;
+        }
+
+        .bracket-round {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            flex: 1;
+            gap: 20px;
+        }
+
+        .bracket-round-title {
+            text-align: center;
+            font-family: 'Oswald', sans-serif;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        .playoff-match-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 12px;
+            width: 250px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .playoff-match-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--accent-red);
+        }
+
+        .lower .playoff-match-card::before {
+            background: var(--accent-neon);
+        }
+
+        .playoff-match-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .playoff-team-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+        }
+
+        .playoff-team-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 75%;
+        }
+
+        .playoff-team-name {
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .playoff-team-name.empty {
+            color: var(--text-muted);
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .playoff-score-input {
+            width: 35px;
+            text-align: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: white;
+            font-weight: 700;
+            padding: 3px;
+            font-size: 0.95rem;
+        }
+
+        .playoff-score-input:focus {
+            border-color: var(--accent-neon);
+        }
+
+        /* --- RESPONSIVIDADE --- */
+        @media (max-width: 992px) {
+            .teams-manager {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            aside {
+                transform: translateX(-100%);
+            }
+
+            aside.open {
+                transform: translateX(0);
+            }
+
+            main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            header {
+                margin-top: 50px;
+            }
+
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                z-index: 110;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .groups-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="menu-toggle" onclick="toggleSidebar()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <aside id="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-crosshairs"></i>
+            <h1>VCT // Control</h1>
+        </div>
+        <nav>
+            <button class="nav-btn active" onclick="switchTab('equipes', this)">
+                <i class="fa-solid fa-user-group"></i> Equipes
+            </button>
+            <button class="nav-btn" onclick="switchTab('grupos', this)">
+                <i class="fa-solid fa-trophy"></i> Grupos
+            </button>
+            <button class="nav-btn" onclick="switchTab('jogos', this)">
+                <i class="fa-solid fa-gamepad"></i> Jogos
+            </button>
+            <button class="nav-btn" onclick="switchTab('playoffs', this)">
+                <i class="fa-solid fa-diagram-project"></i> Playoffs
+            </button>
+        </nav>
+    </aside>
+
+    <main>
+        <section id="tab-equipes" class="section-tab active">
+            <header>
+                <h2>Gerenciamento do Torneio</h2>
+            </header>
+            
+            <div class="teams-manager">
+                <div class="sidebar-forms">
+                    <div class="card-panel">
+                        <h3 id="form-title">Registrar Equipe</h3>
+                        <form id="team-form" onsubmit="handleTeamSubmit(event)">
+                            <input type="hidden" id="edit-index" value="">
+                            
+                            <div class="form-group">
+                                <label for="team-name">Nome da Equipe</label>
+                                <input type="text" id="team-name" placeholder="Ex: LOUD" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="team-logo">URL do Escudo/Logo (ou Imagem Online)</label>
+                                <input type="url" id="team-logo" placeholder="https://exemplo.com/logo.png">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="team-group">Grupo de Destino</label>
+                                <select id="team-group" required>
+                                    </select>
+                            </div>
+                            
+                            <button type="submit" class="btn-action" style="width: 100%; margin-top: 10px;">Salvar Equipe</button>
+                            <button type="button" id="btn-cancel" class="btn-small btn-edit" style="width: 100%; margin-top: 10px; display: none;" onclick="resetForm()">Cancelar Edição</button>
+                        </form>
+                    </div>
+
+                    <div class="card-panel">
+                        <h3>Nomes dos Grupos</h3>
+                        <div class="group-rename-grid">
+                            <div class="form-group">
+                                <label>Chave A</label>
+                                <input type="text" id="name-group-A" value="Grupo A" onchange="updateGroupName('A', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Chave B</label>
+                                <input type="text" id="name-group-B" value="Grupo B" onchange="updateGroupName('B', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Chave C</label>
+                                <input type="text" id="name-group-C" value="Grupo C" onchange="updateGroupName('C', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Chave D</label>
+                                <input type="text" id="name-group-D" value="Grupo D" onchange="updateGroupName('D', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-panel">
+                    <h3>Equipes Inscritas</h3>
+                    <div class="teams-grid" id="teams-container">
+                        </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-grupos" class="section-tab">
+            <header>
+                <h2>Tabelas de Grupos</h2>
+            </header>
+            
+            <div class="groups-container" id="groups-container">
+                </div>
+        </section>
+
+        <section id="tab-jogos" class="section-tab">
+            <header>
+                <h2>Tabela de Jogos / Resultados</h2>
+            </header>
+            
+            <div class="games-grid" id="games-container">
+                </div>
+        </section>
+
+        <section id="tab-playoffs" class="section-tab">
+            <header>
+                <h2>Fase Eliminatória (Playoffs VCT)</h2>
+                <button class="btn-action" onclick="generatePlayoffsFromGroups()"><i class="fa-solid fa-rotate"></i> Gerar/Resetar Playoffs</button>
+            </header>
+
+            <div class="playoffs-container" id="playoffs-container">
+                </div>
+        </section>
+    </main>
+
+    <script>
+        // --- ESTADO INICIAL DO SISTEMA ---
+        let teams = JSON.parse(localStorage.getItem('vct_teams')) || [];
+        let matches = JSON.parse(localStorage.getItem('vct_matches')) || [];
+        
+        // Estado de playoffs estruturado
+        let playoffs = JSON.parse(localStorage.getItem('vct_playoffs')) || null;
+        
+        let groupNames = JSON.parse(localStorage.getItem('vct_group_names')) || {
+            A: "Grupo A",
+            B: "Grupo B",
+            C: "Grupo C",
+            D: "Grupo D"
+        };
+
+        const DEFAULT_LOGO = "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=150&auto=format&fit=crop";
+
+        // --- SISTEMA DE ABAS ---
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.section-tab').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(nav => nav.classList.remove('active'));
+            
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            btn.classList.add('active');
+
+            if(window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+
+            if(tabId === 'grupos') renderGroups();
+            if(tabId === 'jogos') renderGames();
+            if(tabId === 'playoffs') renderPlayoffs();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // --- PERSISTÊNCIA ---
+        function saveToStorage() {
+            localStorage.setItem('vct_teams', JSON.stringify(teams));
+            localStorage.setItem('vct_matches', JSON.stringify(matches));
+            localStorage.setItem('vct_group_names', JSON.stringify(groupNames));
+            localStorage.setItem('vct_playoffs', JSON.stringify(playoffs));
+        }
+
+        // --- ATUALIZAÇÃO DOS NOMES DE GRUPOS ---
+        function initGroupInputs() {
+            for (let g in groupNames) {
+                const input = document.getElementById(`name-group-${g}`);
+                if (input) input.value = groupNames[g];
+            }
+            populateGroupSelect();
+        }
+
+        function updateGroupName(key, value) {
+            const trimmedValue = value.trim();
+            groupNames[key] = trimmedValue !== "" ? trimmedValue : `Grupo ${key}`;
+            saveToStorage();
+            populateGroupSelect();
+            renderTeams();
+        }
+
+        function populateGroupSelect() {
+            const select = document.getElementById('team-group');
+            const currentValue = select.value;
+            
+            select.innerHTML = '';
+            for (let g in groupNames) {
+                const opt = document.createElement('option');
+                opt.value = g;
+                opt.innerText = groupNames[g];
+                select.appendChild(opt);
+            }
+            if (currentValue) select.value = currentValue;
+        }
+
+        // --- GERENCIAMENTO DE EQUIPES (CRUD) ---
+        function renderTeams() {
+            const container = document.getElementById('teams-container');
+            container.innerHTML = '';
+
+            if (teams.length === 0) {
+                container.innerHTML = `<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1;">Nenhuma equipe cadastrada.</p>`;
+                return;
+            }
+
+            teams.forEach((team, index) => {
+                const card = document.createElement('div');
+                card.className = 'team-card';
+                card.innerHTML = `
+                    <div class="team-logo-container">
+                        <img src="${team.logo || DEFAULT_LOGO}" onerror="this.src='${DEFAULT_LOGO}'" alt="Escudo">
+                    </div>
+                    <h4>${team.name}</h4>
+                    <span>${groupNames[team.group]}</span>
+                    <div class="card-actions">
+                        <button class="btn-small btn-edit" onclick="editTeam(${index})"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-small btn-delete" onclick="deleteTeam(${index})"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function handleTeamSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('team-name').value.trim();
+            const logo = document.getElementById('team-logo').value.trim();
+            const group = document.getElementById('team-group').value;
+            const editIndex = document.getElementById('edit-index').value;
+
+            if (editIndex !== "") {
+                const oldGroup = teams[editIndex].group;
+                teams[editIndex] = { name, logo, group };
+                if (oldGroup !== group) {
+                    generateMatches();
+                }
+            } else {
+                teams.push({ name, logo, group });
+                generateMatches();
+            }
+
+            saveToStorage();
+            resetForm();
+            renderTeams();
+        }
+
+        function editTeam(index) {
+            document.getElementById('form-title').innerText = "Editar Equipe";
+            document.getElementById('team-name').value = teams[index].name;
+            document.getElementById('team-logo').value = teams[index].logo;
+            document.getElementById('team-group').value = teams[index].group;
+            document.getElementById('edit-index').value = index;
+            document.getElementById('btn-cancel').style.display = 'block';
+        }
+
+        function deleteTeam(index) {
+            if(confirm(`Deseja realmente remover a equipe ${teams[index].name}?`)) {
+                teams.splice(index, 1);
+                generateMatches();
+                saveToStorage();
+                renderTeams();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('form-title').innerText = "Registrar Equipe";
+            document.getElementById('team-form').reset();
+            document.getElementById('edit-index').value = "";
+            document.getElementById('btn-cancel').style.display = 'none';
+        }
+
+        // --- CONFRONTOS AUTOMÁTICOS EM GRUPOS ---
+        function generateMatches() {
+            const groups = { A: [], B: [], C: [], D: [] };
+            teams.forEach(team => {
+                if(groups[team.group]) groups[team.group].push(team.name);
+            });
+
+            let newMatches = [];
+
+            for (let g in groups) {
+                let currentGroupTeams = groups[g];
+                for (let i = 0; i < currentGroupTeams.length; i++) {
+                    for (let j = i + 1; j < currentGroupTeams.length; j++) {
+                        const t1 = currentGroupTeams[i];
+                        const t2 = currentGroupTeams[j];
+
+                        const existingMatch = matches.find(m => 
+                            m.group === g && 
+                            ((m.teamA === t1 && m.teamB === t2) || (m.teamA === t2 && m.teamB === t1))
+                        );
+
+                        if (existingMatch) {
+                            newMatches.push(existingMatch);
+                        } else {
+                            newMatches.push({
+                                group: g,
+                                teamA: t1,
+                                teamB: t2,
+                                scoreA: "",
+                                scoreB: ""
+                            });
+                        }
+                    }
+                }
+            }
+            matches = newMatches;
+            saveToStorage();
+        }
+
+        function renderGames() {
+            const container = document.getElementById('games-container');
+            container.innerHTML = '';
+
+            if (matches.length === 0) {
+                container.innerHTML = `<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1;">Adicione pelo menos 2 equipes em um mesmo grupo para gerar os confrontos.</p>`;
+                return;
+            }
+
+            matches.forEach((match, index) => {
+                const teamAData = teams.find(t => t.name === match.teamA) || { logo: '' };
+                const teamBData = teams.find(t => t.name === match.teamB) || { logo: '' };
+
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.innerHTML = `
+                    <div class="game-header">
+                        <span>${groupNames[match.group].toUpperCase()}</span>
+                        <span>PARTIDA #${index + 1}</span>
+                    </div>
+                    <div class="matchup">
+                        <div class="matchup-team home">
+                            <strong>${match.teamA}</strong>
+                            <img src="${teamAData.logo || DEFAULT_LOGO}" class="table-logo" alt="">
+                        </div>
+                        <div class="score-input-container">
+                            <input type="number" min="0" value="${match.scoreA}" class="score-input" onchange="updateMatchScore(${index}, 'A', this.value)" placeholder="-">
+                            <span class="vs">X</span>
+                            <input type="number" min="0" value="${match.scoreB}" class="score-input" onchange="updateMatchScore(${index}, 'B', this.value)" placeholder="-">
+                        </div>
+                        <div class="matchup-team away">
+                            <img src="${teamBData.logo || DEFAULT_LOGO}" class="table-logo" alt="">
+                            <strong>${match.teamB}</strong>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateMatchScore(index, side, value) {
+            if (side === 'A') {
+                matches[index].scoreA = value !== "" ? parseInt(value) : "";
+            } else {
+                matches[index].scoreB = value !== "" ? parseInt(value) : "";
+            }
+            saveToStorage();
+        }
+
+        // --- SISTEMA DE TABELA DE GRUPOS ---
+        function calculateGroupStandings() {
+            const groupKeys = ['A', 'B', 'C', 'D'];
+            let standings = { A: [], B: [], C: [], D: [] };
+
+            groupKeys.forEach(g => {
+                const groupTeams = teams.filter(t => t.group === g);
+                if (groupTeams.length === 0) return;
+
+                let stats = {};
+                groupTeams.forEach(t => {
+                    stats[t.name] = {
+                        name: t.name,
+                        logo: t.logo || DEFAULT_LOGO,
+                        v: 0,
+                        d: 0,
+                        sm: 0
+                    };
+                });
+
+                matches.forEach(m => {
+                    if (m.group === g && m.scoreA !== "" && m.scoreB !== "" && stats[m.teamA] && stats[m.teamB]) {
+                        const sA = parseInt(m.scoreA);
+                        const sB = parseInt(m.scoreB);
+
+                        stats[m.teamA].sm += (sA - sB);
+                        stats[m.teamB].sm += (sB - sA);
+
+                        if (sA > sB) {
+                            stats[m.teamA].v += 1;
+                            stats[m.teamB].d += 1;
+                        } else if (sB > sA) {
+                            stats[m.teamB].v += 1;
+                            stats[m.teamA].d += 1;
+                        }
+                    }
+                });
+
+                standings[g] = Object.values(stats).sort((a, b) => {
+                    if (b.v !== a.v) return b.v - a.v;
+                    if (b.sm !== a.sm) return b.sm - a.sm;
+                    return a.name.localeCompare(b.name);
+                });
+            });
+
+            return standings;
+        }
+
+        function renderGroups() {
+            const container = document.getElementById('groups-container');
+            container.innerHTML = '';
+
+            const standings = calculateGroupStandings();
+
+            for (let g in standings) {
+                const sortedStats = standings[g];
+                if (sortedStats.length === 0) continue;
+
+                const groupCard = document.createElement('div');
+                groupCard.className = 'group-table-card';
+                
+                let tableRows = '';
+                sortedStats.forEach((team, i) => {
+                    tableRows += `
+                        <tr>
+                            <td><strong>${i + 1}º</strong></td>
+                            <td>
+                                <div class="team-row-info">
+                                    <img src="${team.logo}" onerror="this.src='${DEFAULT_LOGO}'" class="table-logo">
+                                    <span>${team.name}</span>
+                                </div>
+                            </td>
+                            <td>${team.v}</td>
+                            <td>${team.d}</td>
+                            <td style="color: ${team.sm > 0 ? 'var(--accent-neon)' : team.sm < 0 ? 'var(--accent-red)' : 'inherit'}">
+                                ${team.sm > 0 ? '+' : ''}${team.sm}
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                groupCard.innerHTML = `
+                    <h3>${groupNames[g]}</h3>
+                    <table class="group-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%">Pos</th>
+                                <th style="text-align: left; width: 50%">Equipe</th>
+                                <th>V</th>
+                                <th>D</th>
+                                <th>S.M</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                `;
+                container.appendChild(groupCard);
+            }
+
+            if (container.innerHTML === '') {
+                container.innerHTML = `<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1;">Cadastre equipes primeiro para ver os grupos.</p>`;
+            }
+        }
+
+
+        // --- LÓGICA DE PLAYOFFS (DUPLA ELIMINAÇÃO) ---
+
+        // Função para gerar as partidas iniciais baseado nas classificações
+        function generatePlayoffsFromGroups() {
+            const standings = calculateGroupStandings();
+            
+            // Filtra grupos que realmente têm times
+            const activeGroupKeys = Object.keys(standings).filter(key => standings[key].length > 0);
+            const numGroups = activeGroupKeys.length;
+
+            let qualifiedTeams = [];
+
+            if (numGroups === 2) {
+                // Classificam-se 4 equipes de cada grupo
+                const g1 = standings[activeGroupKeys[0]];
+                const g2 = standings[activeGroupKeys[1]];
+                
+                // Posições: 1º ao 4º de cada chave
+                for (let i = 0; i < 4; i++) {
+                    qualifiedTeams.push(g1[i] ? g1[i].name : `4º do Grupo ${activeGroupKeys[0]}`);
+                    qualifiedTeams.push(g2[i] ? g2[i].name : `4º do Grupo ${activeGroupKeys[1]}`);
+                }
+            } else if (numGroups >= 4) {
+                // Classificam-se 2 equipes de cada grupo (A, B, C, D)
+                for (let i = 0; i < 4; i++) {
+                    const gKey = ['A', 'B', 'C', 'D'][i];
+                    const g = standings[gKey] || [];
+                    qualifiedTeams.push(g[0] ? g[0].name : `1º do ${groupNames[gKey]}`);
+                    qualifiedTeams.push(g[1] ? g[1].name : `2º do ${groupNames[gKey]}`);
+                }
+            } else {
+                // Caso não tenha 2 ou 4 grupos montados perfeitamente, pega as 8 melhores no ranking geral
+                let allSorted = [];
+                activeGroupKeys.forEach(g => allSorted.push(...standings[g]));
+                allSorted.sort((a,b) => b.v - a.v || b.sm - a.sm);
+
+                for(let i=0; i<8; i++) {
+                    qualifiedTeams.push(allSorted[i] ? allSorted[i].name : `Equipe Classificada #${i+1}`);
+                }
+            }
+
+            // Estrutura padrão de Chaves para Dupla Eliminação (8 Equipes)
+            // UB = Upper Bracket (Chave Superior) | LB = Lower Bracket (Chave Inferior)
+            playoffs = {
+                // CHAVE SUPERIOR
+                ub_q1: { id: "ub_q1", title: "Quartas Sup. 1", teamA: qualifiedTeams[0] || "Equipe A", teamB: qualifiedTeams[7] || "Equipe H", scoreA: "", scoreB: "" },
+                ub_q2: { id: "ub_q2", title: "Quartas Sup. 2", teamA: qualifiedTeams[3] || "Equipe D", teamB: qualifiedTeams[4] || "Equipe E", scoreA: "", scoreB: "" },
+                ub_q3: { id: "ub_q3", title: "Quartas Sup. 3", teamA: qualifiedTeams[2] || "Equipe C", teamB: qualifiedTeams[5] || "Equipe F", scoreA: "", scoreB: "" },
+                ub_q4: { id: "ub_q4", title: "Quartas Sup. 4", teamA: qualifiedTeams[1] || "Equipe B", teamB: qualifiedTeams[6] || "Equipe G", scoreA: "", scoreB: "" },
+                
+                ub_s1: { id: "ub_s1", title: "Semifinal Sup. 1", teamA: "", teamB: "", scoreA: "", scoreB: "" },
+                ub_s2: { id: "ub_s2", title: "Semifinal Sup. 2", teamA: "", teamB: "", scoreA: "", scoreB: "" },
+                
+                ub_f:  { id: "ub_f",  title: "Final Superior", teamA: "", teamB: "", scoreA: "", scoreB: "" },
+
+                // CHAVE INFERIOR
+                lb_r1_1: { id: "lb_r1_1", title: "Rodada Inf. 1-1", teamA: "", teamB: "", scoreA: "", scoreB: "" },
+                lb_r1_2: { id: "lb_r1_2", title: "Rodada Inf. 1-2", teamA: "", teamB: "", scoreA: "", scoreB: "" },
+                
+                lb_r2_1: { id: "lb_r2_1", title: "Rodada Inf. 2-1", teamA: "", teamB: "", scoreA: "", scoreB: "" },
+                lb_r2_2: { id: "lb_r2_2", title: "Rodada Inf. 2-2", teamA: "", teamB: "", scoreA: "", scoreB: "" },
+
+                lb_r3:   { id: "lb_r3",   title: "Semifinal Inferior", teamA: "", teamB: "", scoreA: "", scoreB: "" },
+                lb_f:    { id: "lb_f",    title: "Final Inferior", teamA: "", teamB: "", scoreA: "", scoreB: "" },
+
+                // GRANDE FINAL
+                grand_final: { id: "grand_final", title: "Grande Final", teamA: "", teamB: "", scoreA: "", scoreB: "" }
+            };
+
+            saveToStorage();
+            renderPlayoffs();
+        }
+
+        function updatePlayoffScore(matchId, side, value) {
+            if (!playoffs || !playoffs[matchId]) return;
+
+            const scoreVal = value !== "" ? parseInt(value) : "";
+            if (side === 'A') {
+                playoffs[matchId].scoreA = scoreVal;
+            } else {
+                playoffs[matchId].scoreB = scoreVal;
+            }
+
+            // Atualiza toda a lógica de avanço da chave superior e inferior
+            runPlayoffProgressionLogic();
+            saveToStorage();
+            renderPlayoffs();
+        }
+
+        // --- SISTEMA INTELIGENTE DE PROGRESSÃO DE CHAVES (VCT RULES) ---
+        function runPlayoffProgressionLogic() {
+            const p = playoffs;
+
+            // Função helper para obter vencedor e perdedor
+            const getResults = (match) => {
+                if (match.scoreA === "" || match.scoreB === "") return { winner: "", loser: "" };
+                return match.scoreA > match.scoreB 
+                    ? { winner: match.teamA, loser: match.teamB }
+                    : { winner: match.teamB, loser: match.teamA };
+            };
+
+            // UB Quarters -> UB Semis & LB Rodada 1
+            const q1 = getResults(p.ub_q1);
+            const q2 = getResults(p.ub_q2);
+            const q3 = getResults(p.ub_q3);
+            const q4 = getResults(p.ub_q4);
+
+            p.ub_s1.teamA = q1.winner;
+            p.ub_s1.teamB = q2.winner;
+            p.ub_s2.teamA = q3.winner;
+            p.ub_s2.teamB = q4.winner;
+
+            // Perdedores das quartas superiores caem para a Rodada 1 Inferior
+            p.lb_r1_1.teamA = q1.loser;
+            p.lb_r1_1.teamB = q2.loser;
+            p.lb_r1_2.teamA = q3.loser;
+            p.lb_r1_2.teamB = q4.loser;
+
+            // LB Rodada 1 -> LB Rodada 2 (Enfrentam perdedores das UB Semis)
+            const s1 = getResults(p.ub_s1);
+            const s2 = getResults(p.ub_s2);
+            const lbr1_1 = getResults(p.lb_r1_1);
+            const lbr1_2 = getResults(p.lb_r1_2);
+
+            p.ub_f.teamA = s1.winner;
+            p.ub_f.teamB = s2.winner;
+
+            // Cruzamento tático dos perdedores das semis superiores para a chave inferior
+            p.lb_r2_1.teamA = s1.loser; 
+            p.lb_r2_1.teamB = lbr1_2.winner; // Cruza o vencedor da outra chave da LB
+            p.lb_r2_2.teamA = s2.loser;
+            p.lb_r2_2.teamB = lbr1_1.winner;
+
+            // LB Rodada 2 -> LB Rodada 3 (Semi inferior)
+            const lbr2_1 = getResults(p.lb_r2_1);
+            const lbr2_2 = getResults(p.lb_r2_2);
+
+            p.lb_r3.teamA = lbr2_1.winner;
+            p.lb_r3.teamB = lbr2_2.winner;
+
+            // Final Superior & Semi Inferior -> Final Inferior
+            const ubf = getResults(p.ub_f);
+            const lbr3 = getResults(p.lb_r3);
+
+            p.lb_f.teamA = ubf.loser; // Perdedor da Final Superior cai pra Final Inferior
+            p.lb_f.teamB = lbr3.winner;
+
+            // Vencedor da Final Superior & Vencedor da Final Inferior -> Grande Final
+            const lbf = getResults(p.lb_f);
+            p.grand_final.teamA = ubf.winner;
+            p.grand_final.teamB = lbf.winner;
+        }
+
+        function createPlayoffCardHTML(match) {
+            const teamAData = teams.find(t => t.name === match.teamA) || { logo: '' };
+            const teamBData = teams.find(t => t.name === match.teamB) || { logo: '' };
+
+            return `
+                <div class="playoff-match-card">
+                    <div class="playoff-match-title">
+                        <span>${match.title}</span>
+                    </div>
+                    <div class="playoff-team-row">
+                        <div class="playoff-team-info">
+                            <img src="${teamAData.logo || DEFAULT_LOGO}" class="table-logo" alt="">
+                            <span class="playoff-team-name ${!match.teamA ? 'empty' : ''}">${match.teamA || 'A definir'}</span>
+                        </div>
+                        <input type="number" min="0" value="${match.scoreA}" class="playoff-score-input" 
+                            ${!match.teamA || !match.teamB ? 'disabled' : ''} 
+                            onchange="updatePlayoffScore('${match.id}', 'A', this.value)">
+                    </div>
+                    <div class="playoff-team-row">
+                        <div class="playoff-team-info">
+                            <img src="${teamBData.logo || DEFAULT_LOGO}" class="table-logo" alt="">
+                            <span class="playoff-team-name ${!match.teamB ? 'empty' : ''}">${match.teamB || 'A definir'}</span>
+                        </div>
+                        <input type="number" min="0" value="${match.scoreB}" class="playoff-score-input" 
+                            ${!match.teamA || !match.teamB ? 'disabled' : ''} 
+                            onchange="updatePlayoffScore('${match.id}', 'B', this.value)">
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPlayoffs() {
+            const container = document.getElementById('playoffs-container');
+            container.innerHTML = '';
+
+            if (!playoffs) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 50px 0; color: var(--text-muted);">
+                        <i class="fa-solid fa-sitemap" style="font-size: 3rem; margin-bottom: 20px; color: var(--accent-red);"></i>
+                        <p style="font-size: 1.2rem; margin-bottom: 15px;">Os playoffs ainda não foram gerados para este campeonato.</p>
+                        <button class="btn-action" onclick="generatePlayoffsFromGroups()">Gerar Playoffs Automáticos</button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Renderiza estrutura de Chave Superior
+            const upperSection = document.createElement('div');
+            upperSection.className = 'bracket-section';
+            upperSection.innerHTML = `
+                <h3>Chave Superior (Upper Bracket)</h3>
+                <div class="bracket-rounds-wrapper">
+                    <div class="bracket-round">
+                        <div class="bracket-round-title">Quartas de Final</div>
+                        ${createPlayoffCardHTML(playoffs.ub_q1)}
+                        ${createPlayoffCardHTML(playoffs.ub_q2)}
+                        ${createPlayoffCardHTML(playoffs.ub_q3)}
+                        ${createPlayoffCardHTML(playoffs.ub_q4)}
+                    </div>
+                    <div class="bracket-round">
+                        <div class="bracket-round-title">Semifinais</div>
+                        ${createPlayoffCardHTML(playoffs.ub_s1)}
+                        ${createPlayoffCardHTML(playoffs.ub_s2)}
+                    </div>
+                    <div class="bracket-round">
+                        <div class="bracket-round-title">Final Superior</div>
+                        ${createPlayoffCardHTML(playoffs.ub_f)}
+                    </div>
+                </div>
+            `;
+
+            // Renderiza estrutura de Chave Inferior (Mata-mata de quem perdeu)
+            const lowerSection = document.createElement('div');
+            lowerSection.className = 'bracket-section lower';
+            lowerSection.innerHTML = `
+                <h3>Chave Inferior (Lower Bracket)</h3>
+                <div class="bracket-rounds-wrapper">
+                    <div class="bracket-round">
+                        <div class="bracket-round-title">Rodada Inferior 1</div>
+                        ${createPlayoffCardHTML(playoffs.lb_r1_1)}
+                        ${createPlayoffCardHTML(playoffs.lb_r1_2)}
+                    </div>
+                    <div class="bracket-round">
+                        <div class="bracket-round-title">Rodada Inferior 2</div>
+                        ${createPlayoffCardHTML(playoffs.lb_r2_1)}
+                        ${createPlayoffCardHTML(playoffs.lb_r2_2)}
+                    </div>
+                    <div class="bracket-round">
+                        <div class="bracket-round-title">Semifinal Inferior</div>
+                        ${createPlayoffCardHTML(playoffs.lb_r3)}
+                    </div>
+                    <div class="bracket-round">
+                        <div class="bracket-round-title">Final Inferior</div>
+                        ${createPlayoffCardHTML(playoffs.lb_f)}
+                    </div>
+                </div>
+            `;
+
+            // Seção especial da Grande Final
+            const finalSection = document.createElement('div');
+            finalSection.className = 'bracket-section';
+            finalSection.style.border = '2px dashed var(--accent-neon)';
+            finalSection.innerHTML = `
+                <h3 style="color: var(--accent-neon); text-align: center; border: none; padding: 0;"><i class="fa-solid fa-crown"></i> Grande Final <i class="fa-solid fa-crown"></i></h3>
+                <div style="display: flex; justify-content: center; margin-top: 20px;">
+                    ${createPlayoffCardHTML(playoffs.grand_final)}
+                </div>
+            `;
+
+            container.appendChild(upperSection);
+            container.appendChild(lowerSection);
+            container.appendChild(finalSection);
+        }
+
+        // --- INICIALIZAÇÃO ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initGroupInputs();
+            renderTeams();
+        });
+    </script>
+</body>
+</html>
